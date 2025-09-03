@@ -52,6 +52,14 @@ export async function signUp(params: SignUpParams) {
   } catch (error: any) {
     console.error("Error creating user:", error);
 
+    // Handle Firebase connection errors
+    if (error.code === 2 || error.message?.includes("DECODER")) {
+      return {
+        success: false,
+        message: "Firebase configuration error. Please check your environment variables.",
+      };
+    }
+
     // Handle Firebase specific errors
     if (error.code === "auth/email-already-exists") {
       return {

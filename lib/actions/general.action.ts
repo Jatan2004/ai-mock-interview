@@ -95,31 +95,51 @@ export async function getLatestInterviews(
 ): Promise<Interview[] | null> {
   const { userId, limit = 20 } = params;
 
-  const interviews = await db
-    .collection("interviews")
-    .orderBy("createdAt", "desc")
-    .where("finalized", "==", true)
-    .where("userId", "!=", userId)
-    .limit(limit)
-    .get();
+  // Guard against undefined userId to prevent invalid Firestore query values
+  if (!userId) return [];
 
-  return interviews.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Interview[];
+  try {
+    // For inequality (!=) queries, Firestore requires the first orderBy to be on the same field
+    const interviews = await db
+      .collection("interviews")
+      .where("finalized", "==", true)
+      .where("userId", "!=", userId)
+      .orderBy("userId")
+      .orderBy("createdAt", "desc")
+      .limit(limit)
+      .get();
+
+    return interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Interview[];
+  } catch (error: any) {
+    // If composite index is missing or ordering invalid, avoid crashing the page
+    console.warn("Failed to fetch latest interviews:", error?.message || error);
+    return [];
+  }
 }
 
 export async function getInterviewsByUserId(
   userId: string
 ): Promise<Interview[] | null> {
-  const interviews = await db
-    .collection("interviews")
-    .where("userId", "==", userId)
-    .orderBy("createdAt", "desc")
-    .get();
+  // Guard against undefined userId to prevent invalid Firestore query values
+  if (!userId) return [];
 
-  return interviews.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Interview[];
+  try {
+    const interviews = await db
+      .collection("interviews")
+      .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    return interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Interview[];
+  } catch (error: any) {
+    // If composite index is missing, avoid crashing the page and return empty
+    console.warn("Failed to fetch user interviews:", error?.message || error);
+    return [];
+  }
 }
