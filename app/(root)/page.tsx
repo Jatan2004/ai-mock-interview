@@ -58,6 +58,7 @@ async function Home() {
                 type={interview.type}
                 techstack={interview.techstack}
                 createdAt={interview.createdAt}
+                canDelete
               />
             ))
           ) : (
@@ -80,6 +81,7 @@ async function Home() {
                 type={interview.type}
                 techstack={interview.techstack}
                 createdAt={interview.createdAt}
+                canDelete={false}
               />
             ))
           ) : (

@@ -118,6 +118,28 @@ const Agent = ({
     setCallStatus(CallStatus.CONNECTING);
 
     if (type === "generate") {
+      try {
+        // Ensure an interview document exists before starting assistant
+        const phrase = typeof window !== "undefined"
+          ? window.prompt("Enter the role/title for this interview (e.g., Frontend Developer)", "")
+          : "";
+
+        await fetch("/api/interviews/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: phrase && phrase.trim() ? phrase.trim() : "Custom Role",
+            type: "technical",
+            level: "",
+            techstack: "",
+            questions: [],
+            userid: userId,
+          }),
+        });
+      } catch (e) {
+        console.error("Failed to create interview before starting call", e);
+      }
+
       await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
         variableValues: {
           username: userName,

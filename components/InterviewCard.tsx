@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { Button } from "./ui/button";
+import DeleteInterviewButton from "./DeleteInterviewButton";
 import DisplayTechIcons from "./DisplayTechIcons";
 
 import { cn, getRandomInterviewCover } from "@/lib/utils";
@@ -15,6 +16,7 @@ const InterviewCard = async ({
   type,
   techstack,
   createdAt,
+  canDelete,
 }: InterviewCardProps) => {
   const feedback =
     userId && interviewId
@@ -88,20 +90,25 @@ const InterviewCard = async ({
           </p>
         </div>
 
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between items-center gap-2">
           <DisplayTechIcons techStack={techstack} />
 
-          <Button className="btn-primary">
-            <Link
-              href={
-                feedback
-                  ? `/interview/${interviewId}/feedback`
-                  : `/interview/${interviewId}`
-              }
-            >
-              {feedback ? "Check Feedback" : "View Interview"}
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button className="btn-primary">
+              <Link
+                href={
+                  feedback
+                    ? `/interview/${interviewId}/feedback`
+                    : `/interview/${interviewId}`
+                }
+              >
+                {feedback ? "Check Feedback" : "View Interview"}
+              </Link>
+            </Button>
+            {canDelete && userId && interviewId ? (
+              <DeleteInterviewButton interviewId={interviewId} />
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
