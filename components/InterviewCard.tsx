@@ -26,7 +26,13 @@ const InterviewCard = async ({
         })
       : null;
 
-  const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
+  const normalizedType = (() => {
+    const t = String(type || "").toLowerCase();
+    if (t.includes("mix")) return "Mixed";
+    if (t.startsWith("beh")) return "Behavioral";
+    if (t.startsWith("tech")) return "Technical";
+    return t ? t.charAt(0).toUpperCase() + t.slice(1) : "Technical";
+  })();
 
   const badgeColor =
     {

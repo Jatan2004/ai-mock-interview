@@ -144,6 +144,8 @@
   p {
     @apply text-light-100;
   }
+  /* Light theme paragraph text for proper contrast */
+  html:not(.dark) p, .light p { @apply text-foreground; }
   h2 {
     @apply text-3xl font-semibold;
   }
@@ -156,6 +158,8 @@
   li {
     @apply text-light-100;
   }
+  /* Light theme list text */
+  html:not(.dark) li, .light li { @apply text-foreground; }
 }
 
 @layer components {
@@ -180,6 +184,10 @@
   .btn-secondary {
     @apply w-fit !bg-dark-200 !text-primary-200 hover:!bg-dark-200/80 !rounded-full !font-bold px-5 cursor-pointer min-h-10;
   }
+  /* Light theme secondary button */
+  html:not(.dark) .btn-secondary, .light .btn-secondary {
+    @apply !bg-secondary !text-foreground hover:!bg-secondary/80 border border-input;
+  }
 
   .btn-upload {
     @apply bg-dark-200 rounded-full min-h-12 px-5 cursor-pointer border border-input  overflow-hidden;
@@ -188,10 +196,14 @@
   .card-border {
     @apply border-gradient p-0.5 rounded-2xl w-fit;
   }
+  /* Light theme card border */
+  html:not(.dark) .card-border, .light .card-border { @apply bg-gradient-to-b from-[#E6E8EE] to-[#E6E8EE80]; }
 
   .card {
     @apply dark-gradient rounded-2xl min-h-full;
   }
+  /* Light theme card surface */
+  html:not(.dark) .card, .light .card { @apply bg-gradient-to-b from-white to-[#F6F7FB]; }
 
   .form {
     @apply w-full;
@@ -205,7 +217,7 @@
     }
 
     .btn {
-      @apply !w-full !bg-primary-200 !text-dark-100 hover:!bg-primary-200/80 !rounded-full !min-h-10 !font-bold !px-5 cursor-pointer;
+      @apply !bg-primary-200 !text-dark-100 hover:!bg-primary-200/80 !rounded-full !min-h-10 !font-bold !px-5 cursor-pointer !w-fit max-sm:!w-full;
     }
   }
 
@@ -215,16 +227,20 @@
     h3 {
       @apply text-center text-primary-100 mt-5;
     }
+    /* Light theme interviewer/user names */
+    html:not(.dark) .call-view h3, .light .call-view h3 { @apply text-foreground; }
 
     .card-interviewer {
       @apply flex-center flex-col gap-2 p-7 h-[400px] blue-gradient-dark rounded-lg border-2 border-primary-200/50 flex-1 sm:basis-1/2 w-full;
     }
+    /* Light theme interviewer surface */
+    html:not(.dark) .card-interviewer, .light .card-interviewer { @apply bg-gradient-to-b from-white to-[#F6F7FB] border-primary-200/30; }
 
     .avatar {
       @apply z-10 flex items-center justify-center blue-gradient rounded-full size-[120px] relative;
 
       .animate-speak {
-        @apply absolute inline-flex size-5/6 animate-ping rounded-full bg-primary-200 opacity-75;
+        @apply absolute inline-flex size-5/6 animate-ping rounded-full bg-primary-200 opacity-70 motion-reduce:opacity-40 motion-reduce:animate-none;
       }
     }
 
@@ -233,8 +249,10 @@
     }
 
     .card-content {
-      @apply flex flex-col gap-2 justify-center items-center p-7 dark-gradient rounded-2xl min-h-full;
+      @apply flex flex-col gap-2 justify-center items-center p-7 blue-gradient-dark rounded-2xl min-h-full;
     }
+    /* Light theme user panel */
+    html:not(.dark) .card-content, .light .card-content { @apply bg-gradient-to-b from-white to-[#F6F7FB]; }
   }
 
   .transcript-border {
@@ -248,6 +266,9 @@
       }
     }
   }
+  /* Light theme transcript text */
+  html:not(.dark) .transcript-border .transcript { @apply bg-gradient-to-b from-white to-[#F6F7FB]; }
+  html:not(.dark) .transcript-border .transcript p { @apply text-foreground; }
 
   .section-feedback {
     @apply flex flex-col gap-8 max-w-5xl mx-auto max-sm:px-4 text-lg leading-7;
@@ -268,6 +289,8 @@
   .card-cta {
     @apply flex flex-row blue-gradient-dark rounded-3xl px-16 py-6 items-center justify-between max-sm:px-4;
   }
+  /* Light theme hero */
+  html:not(.dark) .card-cta, .light .card-cta { @apply bg-gradient-to-l from-[#FFFFFF] to-[#CAC5FE]; }
 
   .interviews-section {
     @apply flex flex-wrap gap-4 max-lg:flex-col w-full items-stretch;
@@ -276,6 +299,8 @@
   .interview-text {
     @apply text-lg text-center text-white;
   }
+  /* Light theme interview text */
+  :root:not(.dark) .interview-text { @apply text-foreground; }
 
   .progress {
     @apply h-1.5 text-[5px] font-bold bg-primary-200 rounded-full flex-center;
@@ -292,6 +317,11 @@
       @apply text-sm font-semibold capitalize;
     }
   }
+  /* Light theme interview cards (Your Interviews / Take Interviews) */
+  html:not(.dark) .card-interview {
+    @apply bg-gradient-to-b from-white to-[#F6F7FB] border border-input shadow-sm;
+  }
+  html:not(.dark) .card-interview .badge-text { @apply text-foreground; }
 }
 
 @utility dark-gradient {

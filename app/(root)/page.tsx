@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
+import { interviewCovers } from "@/constants";
 
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
@@ -24,14 +25,14 @@ async function Home() {
   return (
     <>
       <section className="card-cta">
-        <div className="flex flex-col gap-6 max-w-lg">
-          <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
+        <div className="flex flex-col gap-7 max-w-lg">
+          <h2 className="text-4xl md:text-5xl leading-tight">Crack your next interview with AI mock sessions</h2>
           <p className="text-lg">
-            Practice real interview questions & get instant feedback
+            Practice real questions in a timed, voice-first session and get instant, rubric-based feedback.
           </p>
 
           <Button asChild className="btn-primary max-sm:w-full">
-            <Link href="/interview">Start an Interview</Link>
+            <Link href="/interview" aria-label="Start an AI mock interview">Create mock interview</Link>
           </Button>
         </div>
 
@@ -42,6 +43,35 @@ async function Home() {
           height={400}
           className="max-sm:hidden"
         />
+      </section>
+
+      {/* How it works */}
+      <section className="flex flex-col gap-4 mt-8">
+        <h2>How it works</h2>
+        <p className="text-sm text-light-400">Three simple steps to get interview-ready.</p>
+        <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1">
+          <div className="card p-6 min-h-40 card-hover">
+            <div className="flex items-center gap-3 mb-2">
+              <Image src="/globe.svg" alt="choose role" width={24} height={24} />
+              <h3 className="text-primary-100">Choose your role</h3>
+            </div>
+            <p>Select a role or generate a custom interview tailored to your goals.</p>
+          </div>
+          <div className="card p-6 min-h-40 card-hover">
+            <div className="flex items-center gap-3 mb-2">
+              <Image src="/react.svg" alt="practice" width={24} height={24} />
+              <h3 className="text-primary-100">Practice in real-time</h3>
+            </div>
+            <p>Speak your answers. The AI interviewer adapts and asks follow-ups.</p>
+          </div>
+          <div className="card p-6 min-h-40 card-hover">
+            <div className="flex items-center gap-3 mb-2">
+              <Image src="/star.svg" alt="get feedback" width={24} height={24} />
+              <h3 className="text-primary-100">Get instant feedback</h3>
+            </div>
+            <p>Review scores and targeted tips to improve on your next attempt.</p>
+          </div>
+        </div>
       </section>
 
       <section className="flex flex-col gap-6 mt-8">
@@ -66,6 +96,8 @@ async function Home() {
           )}
         </div>
       </section>
+
+      
 
       <section className="flex flex-col gap-6 mt-8">
         <h2>Take Interviews</h2>
