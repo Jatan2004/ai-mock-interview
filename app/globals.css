@@ -29,37 +29,37 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.15 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.4 0.15 260);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.2 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.4 0.15 260);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.4 0.15 260);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.96 0 0);
+  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: oklch(0.4 0.15 260);
 }
 
 .dark {
@@ -141,6 +141,36 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Light mode background enhancement */
+  html:not(.dark) body, .light body {
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50;
+    background-attachment: fixed;
+    position: relative;
+  }
+  
+  /* Add subtle pattern overlay for light mode */
+  html:not(.dark) body::before, .light body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.8) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+    animation: float 20s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-1deg); }
+  }
   p {
     @apply text-light-100;
   }
@@ -149,6 +179,10 @@
   h2 {
     @apply text-3xl font-semibold;
   }
+  /* Light theme headings */
+  html:not(.dark) h2, .light h2 { @apply text-gray-900; }
+  html:not(.dark) h3, .light h3 { @apply text-gray-800; }
+  
   h3 {
     @apply text-2xl font-semibold;
   }
@@ -181,29 +215,52 @@
   .btn-primary {
     @apply w-fit !bg-primary-200 !text-dark-100 hover:!bg-primary-200/80 !rounded-full !font-bold px-5 cursor-pointer min-h-10;
   }
+  /* Light theme primary button */
+  html:not(.dark) .btn-primary, .light .btn-primary {
+    @apply !bg-primary !text-primary-foreground hover:!bg-primary/90 shadow-sm;
+  }
+  
   .btn-secondary {
     @apply w-fit !bg-dark-200 !text-primary-200 hover:!bg-dark-200/80 !rounded-full !font-bold px-5 cursor-pointer min-h-10;
   }
   /* Light theme secondary button */
   html:not(.dark) .btn-secondary, .light .btn-secondary {
-    @apply !bg-secondary !text-foreground hover:!bg-secondary/80 border border-input;
+    @apply !bg-secondary !text-foreground hover:!bg-secondary/80 border border-input shadow-sm;
   }
 
   .btn-upload {
     @apply bg-dark-200 rounded-full min-h-12 px-5 cursor-pointer border border-input  overflow-hidden;
+  }
+  /* Light theme upload button */
+  html:not(.dark) .btn-upload, .light .btn-upload {
+    @apply bg-white border-gray-200 hover:bg-gray-50 shadow-sm;
   }
 
   .card-border {
     @apply border-gradient p-0.5 rounded-2xl w-fit;
   }
   /* Light theme card border */
-  html:not(.dark) .card-border, .light .card-border { @apply bg-gradient-to-b from-[#E6E8EE] to-[#E6E8EE80]; }
+  html:not(.dark) .card-border, .light .card-border { 
+    @apply bg-gradient-to-b from-[#E6E8EE] to-[#E6E8EE80] shadow-sm; 
+  }
 
   .card {
     @apply dark-gradient rounded-2xl min-h-full;
   }
   /* Light theme card surface */
-  html:not(.dark) .card, .light .card { @apply bg-gradient-to-b from-white to-[#F6F7FB]; }
+  html:not(.dark) .card, .light .card { 
+    @apply shadow-lg border border-white/40 hover:shadow-xl transition-all duration-300; 
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(248, 250, 252, 0.9) 50%, 
+      rgba(241, 245, 249, 0.85) 100%);
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Light theme card hover effect */
+  html:not(.dark) .card-hover, .light .card-hover {
+    @apply hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300;
+  }
 
   .form {
     @apply w-full;
@@ -211,13 +268,25 @@
     .label {
       @apply !text-light-100 !font-normal;
     }
+    /* Light theme form labels */
+    html:not(.dark) .form .label, .light .form .label {
+      @apply !text-foreground;
+    }
 
     .input {
       @apply !bg-dark-200 !rounded-full !min-h-12 !px-5 placeholder:!text-light-100;
     }
+    /* Light theme form inputs */
+    html:not(.dark) .form .input, .light .form .input {
+      @apply !bg-white !border !border-gray-200 placeholder:!text-muted-foreground focus:!border-primary focus:!ring-1 focus:!ring-primary;
+    }
 
     .btn {
       @apply !bg-primary-200 !text-dark-100 hover:!bg-primary-200/80 !rounded-full !min-h-10 !font-bold !px-5 cursor-pointer !w-fit max-sm:!w-full;
+    }
+    /* Light theme form buttons */
+    html:not(.dark) .form .btn, .light .form .btn {
+      @apply !bg-primary !text-primary-foreground hover:!bg-primary/90;
     }
   }
 
@@ -285,12 +354,27 @@
   .root-layout {
     @apply flex mx-auto max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8;
   }
+  
+  /* Light theme navigation */
+  html:not(.dark) nav, .light nav {
+    @apply bg-white/90 backdrop-blur-md border border-white/20 rounded-xl px-6 py-4 shadow-lg;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%);
+  }
 
   .card-cta {
     @apply flex flex-row blue-gradient-dark rounded-3xl px-16 py-6 items-center justify-between max-sm:px-4;
   }
   /* Light theme hero */
-  html:not(.dark) .card-cta, .light .card-cta { @apply bg-gradient-to-l from-[#FFFFFF] to-[#CAC5FE]; }
+  html:not(.dark) .card-cta, .light .card-cta { 
+    @apply shadow-xl border border-white/30; 
+    background: linear-gradient(135deg, 
+      rgba(248, 249, 252, 0.95) 0%, 
+      rgba(232, 234, 246, 0.9) 25%, 
+      rgba(202, 197, 254, 0.8) 50%, 
+      rgba(165, 180, 252, 0.7) 75%, 
+      rgba(129, 140, 248, 0.6) 100%);
+    backdrop-filter: blur(10px);
+  }
 
   .interviews-section {
     @apply flex flex-wrap gap-4 max-lg:flex-col w-full items-stretch;
@@ -309,6 +393,10 @@
   .tech-tooltip {
     @apply absolute bottom-full mb-1 hidden group-hover:flex px-2 py-1 text-xs text-white bg-gray-700 rounded-md shadow-md;
   }
+  /* Light theme tech tooltip */
+  html:not(.dark) .tech-tooltip, .light .tech-tooltip {
+    @apply text-white bg-gray-800;
+  }
 
   .card-interview {
     @apply dark-gradient rounded-2xl min-h-full flex flex-col p-6 relative overflow-hidden gap-10 justify-between;
@@ -319,9 +407,20 @@
   }
   /* Light theme interview cards (Your Interviews / Take Interviews) */
   html:not(.dark) .card-interview {
-    @apply bg-gradient-to-b from-white to-[#F6F7FB] border border-input shadow-sm;
+    @apply border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(248, 250, 252, 0.9) 50%, 
+      rgba(241, 245, 249, 0.85) 100%);
+    backdrop-filter: blur(10px);
   }
-  html:not(.dark) .card-interview .badge-text { @apply text-foreground; }
+  html:not(.dark) .card-interview .badge-text { 
+    @apply text-white font-semibold; 
+  }
+  /* Light theme badge colors */
+  html:not(.dark) .card-interview .bg-light-400 { @apply bg-blue-500; }
+  html:not(.dark) .card-interview .bg-light-600 { @apply bg-purple-500; }
+  html:not(.dark) .card-interview .bg-light-800 { @apply bg-indigo-600; }
 }
 
 @utility dark-gradient {
@@ -346,6 +445,16 @@
 
 @utility flex-center {
   @apply flex items-center justify-center;
+}
+
+/* Logo theme styling */
+.logo-theme {
+  @apply dark:invert-0;
+  filter: brightness(0) saturate(100%) invert(25%) sepia(100%) saturate(1500%) hue-rotate(250deg) brightness(110%) contrast(110%);
+}
+
+.dark .logo-theme {
+  filter: none;
 }
 
 @utility animate-fadeIn {

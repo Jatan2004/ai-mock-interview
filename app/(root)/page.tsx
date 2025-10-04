@@ -48,26 +48,26 @@ async function Home() {
       {/* How it works */}
       <section className="flex flex-col gap-4 mt-8">
         <h2>How it works</h2>
-        <p className="text-sm text-light-400">Three simple steps to get interview-ready.</p>
+        <p className="text-sm text-muted-foreground">Three simple steps to get interview-ready.</p>
         <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1">
           <div className="card p-6 min-h-40 card-hover">
             <div className="flex items-center gap-3 mb-2">
               <Image src="/globe.svg" alt="choose role" width={24} height={24} />
-              <h3 className="text-primary-100">Choose your role</h3>
+              <h3 className="text-primary dark:text-primary-100">Choose your role</h3>
             </div>
             <p>Select a role or generate a custom interview tailored to your goals.</p>
           </div>
           <div className="card p-6 min-h-40 card-hover">
             <div className="flex items-center gap-3 mb-2">
               <Image src="/react.svg" alt="practice" width={24} height={24} />
-              <h3 className="text-primary-100">Practice in real-time</h3>
+              <h3 className="text-primary dark:text-primary-100">Practice in real-time</h3>
             </div>
             <p>Speak your answers. The AI interviewer adapts and asks follow-ups.</p>
           </div>
           <div className="card p-6 min-h-40 card-hover">
             <div className="flex items-center gap-3 mb-2">
               <Image src="/star.svg" alt="get feedback" width={24} height={24} />
-              <h3 className="text-primary-100">Get instant feedback</h3>
+              <h3 className="text-primary dark:text-primary-100">Get instant feedback</h3>
             </div>
             <p>Review scores and targeted tips to improve on your next attempt.</p>
           </div>

@@ -39,7 +39,7 @@ const Feedback = async ({ params }: RouteParams) => {
             <Image src="/star.svg" width={22} height={22} alt="star" />
             <p>
               Overall Impression:{" "}
-              <span className="text-primary-200 font-bold">
+              <span className="text-primary dark:text-primary-200 font-bold">
                 {feedback?.totalScore}
               </span>
               /100
@@ -96,7 +96,7 @@ const Feedback = async ({ params }: RouteParams) => {
       <div className="buttons">
         <Button className="btn-secondary flex-1">
           <Link href="/" className="flex w-full justify-center">
-            <p className="text-sm font-semibold text-primary-200 text-center">
+            <p className="text-sm font-semibold text-primary dark:text-primary-200 text-center">
               Back to dashboard
             </p>
           </Link>

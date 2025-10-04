@@ -326,7 +326,7 @@ const Agent = ({
             <button
               type="button"
               aria-label="Close create interview"
-              className="absolute right-3 top-3 text-light-400 hover:text-light-200 cursor-pointer text-2xl leading-none p-1 rounded-md hover:bg-dark-100"
+              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground cursor-pointer text-2xl leading-none p-1 rounded-md hover:bg-secondary"
               onClick={() => setShowCreateForm(false)}
               title="Close"
             >
@@ -335,7 +335,7 @@ const Agent = ({
             <form className="card p-6 md:p-8 flex flex-col gap-6 form" onSubmit={handleCreateAndStart}>
               <div>
                 <h3 id="create-interview-title">Create interview</h3>
-                <p className="text-sm text-light-400 mt-1">Fill in a few details so we can tailor your mock session.</p>
+                <p className="text-sm text-muted-foreground mt-1">Fill in a few details so we can tailor your mock session.</p>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -349,7 +349,7 @@ const Agent = ({
                   required
                   aria-describedby="role-help"
                 />
-                <span id="role-help" className="text-xs text-light-400">Job title or role you are interviewing for.</span>
+                <span id="role-help" className="text-xs text-muted-foreground">Job title or role you are interviewing for.</span>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {["Frontend Developer","Backend Developer","Data Analyst"].map((preset) => (
                     <button
@@ -467,8 +467,8 @@ const Agent = ({
 
       <div className="w-full flex flex-col items-center gap-3">
         {callStatus === "ACTIVE" && (
-          <div className="text-xs text-light-400">
-            Session time: <span className="text-primary-200 font-semibold">{formatTime(elapsedSeconds)}</span>
+          <div className="text-xs text-muted-foreground">
+            Session time: <span className="text-primary dark:text-primary-200 font-semibold">{formatTime(elapsedSeconds)}</span>
           </div>
         )}
         {callStatus !== "ACTIVE" ? (
