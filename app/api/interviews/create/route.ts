@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { role, type, level, techstack, questions, userid } = body || {};
+    const { role, type, level, techstack, questions, userid, numQuestions } = body || {};
 
     const sessionUser = await getCurrentUser();
     const ownerUserId = sessionUser?.id ?? userid;
@@ -25,6 +25,7 @@ export async function POST(request: Request) {
             .map((t) => t.trim())
             .filter(Boolean),
       questions: Array.isArray(questions) ? questions : [],
+      numQuestions: typeof numQuestions === "number" ? numQuestions : 0,
       userId: ownerUserId,
       finalized: true,
       coverImage: getRandomInterviewCover(),

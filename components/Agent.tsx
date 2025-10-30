@@ -31,6 +31,7 @@ const Agent = ({
   questions,
   role,
   techstack,
+  numQuestions,
 }: AgentProps) => {
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -53,6 +54,7 @@ const Agent = ({
   const [lastAssistantSpeechStartedAt, setLastAssistantSpeechStartedAt] = useState<number>(0);
   const [textInputEnabled, setTextInputEnabled] = useState<boolean>(true);
   const maxTextChars = 500;
+  const [formNumQuestions, setFormNumQuestions] = useState<number>(5);
 
   // Browser TTS fallback removed to ensure consistent agent voice
   // Close modal with ESC
@@ -218,11 +220,14 @@ const Agent = ({
     setCallStatus(CallStatus.CONNECTING);
     let formattedQuestions = "";
     let maxQuestions = 0;
-    if (questions) {
-      formattedQuestions = questions
-        .map((question) => `- ${question}`)
-        .join("\n");
+    // If user supplied their own question texts, use those
+    if (questions && questions.length > 0) {
+      formattedQuestions = questions.map((question) => `- ${question}`).join("\n");
       maxQuestions = questions.length;
+    } else if (numQuestions && numQuestions > 0) {
+      // No user texts: enforce strict AI cap
+      formattedQuestions = `(Auto-generate ${numQuestions} questions based on topic/role, do not exceed)`;
+      maxQuestions = numQuestions;
     }
 
     await vapi.start(interviewer, {
@@ -252,6 +257,7 @@ const Agent = ({
           level: formLevel.trim(),
           techstack: formTechstack.trim(),
           questions: [],
+          numQuestions: formNumQuestions,
           userid: userId,
         }),
       });
@@ -538,6 +544,20 @@ const Agent = ({
                     value={formLevel}
                     onChange={(e) => setFormLevel(e.target.value)}
                   />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="label" htmlFor="numQuestions">Number of Questions</label>
+                  <input
+                    id="numQuestions"
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={formNumQuestions}
+                    className="input"
+                    onChange={e => setFormNumQuestions(Number(e.target.value))}
+                    required
+                  />
+                  <span className="text-xs text-muted-foreground">How many questions should the interviewer ask?</span>
                 </div>
                 <div className="flex flex-col gap-2 md:col-span-1 md:col-start-auto">
                   <label className="label" htmlFor="techstack">Tech stack</label>

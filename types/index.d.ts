@@ -57,6 +57,7 @@ interface AgentProps {
   questions?: string[];
   role?: string;
   techstack?: string[];
+  numQuestions?: number;
 }
 
 interface RouteParams {
