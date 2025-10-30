@@ -13,6 +13,8 @@ const Page = async () => {
         userId={user?.id}
         profileImage={user?.profileURL}
         type="generate"
+        role=""
+        techstack={[]}
       />
     </>
   );

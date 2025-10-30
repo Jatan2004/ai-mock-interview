@@ -29,6 +29,8 @@ const Agent = ({
   feedbackId,
   type,
   questions,
+  role,
+  techstack,
 }: AgentProps) => {
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -45,6 +47,14 @@ const Agent = ({
   const [formTechstack, setFormTechstack] = useState<string>("");
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [showTypeOptions, setShowTypeOptions] = useState<boolean>(false);
+  const [textReply, setTextReply] = useState<string>("");
+  const [isSendingText, setIsSendingText] = useState<boolean>(false);
+  const [lastAssistantSpokenAt, setLastAssistantSpokenAt] = useState<number>(0);
+  const [lastAssistantSpeechStartedAt, setLastAssistantSpeechStartedAt] = useState<number>(0);
+  const [textInputEnabled, setTextInputEnabled] = useState<boolean>(true);
+  const maxTextChars = 500;
+
+  // Browser TTS fallback removed to ensure consistent agent voice
   // Close modal with ESC
   useEffect(() => {
     if (!showCreateForm) return;
@@ -64,7 +74,7 @@ const Agent = ({
       setCallStatus(CallStatus.FINISHED);
     };
 
-    const onMessage = (message: Message) => {
+    const onMessage = (message: any) => {
       if (message.type === "transcript") {
         if (message.role === "user") {
           if (message.transcriptType === "partial") {
@@ -82,17 +92,33 @@ const Agent = ({
           const newMessage = { role: message.role, content: message.transcript };
           setMessages((prev) => [...prev, newMessage]);
         }
+        return;
+      }
+
+      // Fallback for text messages from the assistant (non-transcript payloads)
+      try {
+        const maybeContent = message?.content ?? message?.message ?? message?.text;
+        const maybeRole = message?.role ?? "assistant";
+        if (typeof maybeContent === "string" && maybeContent.trim().length > 0) {
+          const newMessage = { role: maybeRole, content: maybeContent } as SavedMessage;
+          setMessages((prev) => [...prev, newMessage]);
+          // No local TTS here; rely on SDK voice only
+        }
+      } catch (e) {
+        console.warn("Unhandled message payload", message);
       }
     };
 
     const onSpeechStart = () => {
       console.log("speech start");
       setIsSpeaking(true);
+      setLastAssistantSpeechStartedAt(Date.now());
     };
 
     const onSpeechEnd = () => {
       console.log("speech end");
       setIsSpeaking(false);
+      setLastAssistantSpokenAt(Date.now());
     };
 
     const onError = (error: Error) => {
@@ -191,15 +217,22 @@ const Agent = ({
 
     setCallStatus(CallStatus.CONNECTING);
     let formattedQuestions = "";
+    let maxQuestions = 0;
     if (questions) {
       formattedQuestions = questions
         .map((question) => `- ${question}`)
         .join("\n");
+      maxQuestions = questions.length;
     }
 
     await vapi.start(interviewer, {
       variableValues: {
         questions: formattedQuestions,
+        role: role || "",
+        techstack: (techstack || []).join(", "),
+        type: "interview",
+        level: "",
+        max_questions: maxQuestions,
       },
     });
   };
@@ -231,6 +264,11 @@ const Agent = ({
           variableValues: {
             username: userName,
             userid: userId,
+            role: formRole.trim(),
+            techstack: formTechstack.trim(),
+            type: formType,
+            level: formLevel.trim(),
+            max_questions: 0,
           },
         });
       }
@@ -244,6 +282,92 @@ const Agent = ({
   const handleDisconnect = () => {
     setCallStatus(CallStatus.FINISHED);
     vapi.stop();
+  };
+
+  const handleSendText = async () => {
+    const trimmed = textReply.trim();
+    if (!trimmed) return;
+    if (callStatus !== CallStatus.ACTIVE) return;
+    try {
+      setIsSendingText(true);
+      // Send a text message to the agent during the active call.
+      // Try multiple supported shapes for compatibility across SDK versions.
+      const anyVapi = vapi as any;
+      if (typeof anyVapi.send === "function") {
+        try {
+          await anyVapi.send({ type: "input_text", text: trimmed });
+        } catch (e) {
+          // fallback shapes
+          try {
+            await anyVapi.send({ type: "message", role: "user", content: trimmed });
+          } catch (e2) {
+            try {
+              await anyVapi.send({ event: "input_text", text: trimmed });
+            } catch (e3) {
+              // ignore; other fallbacks below
+            }
+          }
+        }
+      }
+      if (typeof (anyVapi.sendMessage) === "function") {
+        try {
+          await anyVapi.sendMessage(trimmed);
+        } catch {}
+      }
+      if (typeof (anyVapi.inputText) === "function") {
+        try {
+          await anyVapi.inputText(trimmed);
+        } catch {}
+      }
+      setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+      setTextReply("");
+      // Voice-first: rely on Vapi to process and speak the reply during the call.
+      // If no assistant speech occurs shortly, synthesize via backend + say() as a fallback.
+      const before = Date.now();
+      setTimeout(async () => {
+        // If assistant hasn't started speaking since we sent the message, fallback
+        if (lastAssistantSpeechStartedAt < before) {
+          try {
+            const res = await fetch("/api/chat-reply", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userText: trimmed,
+                role: role || "",
+                techstack: (techstack || []).join(", "),
+                type: "interview",
+                level: "",
+                max_questions: 0,
+                contextQuestions: messages
+                  .filter((m) => m.role !== "system")
+                  .map((m) => `${m.role}: ${m.content}`)
+                  .join("\n"),
+              }),
+            });
+            const data = await res.json();
+            const reply: string | undefined = data?.reply;
+            if (data?.success && reply) {
+              setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+              // First try to play via SDK voice (same call voice)
+              const anyVapi2 = vapi as any;
+              let attemptedAt = Date.now();
+              if (typeof anyVapi2.say === "function") {
+                try { await anyVapi2.say(reply); } catch {}
+                attemptedAt = Date.now();
+              } else if (typeof anyVapi2.send === "function") {
+                try { await anyVapi2.send({ type: "output_text", text: reply }); } catch {}
+                attemptedAt = Date.now();
+              }
+              // No local TTS fallback; rely on SDK voice only
+            }
+          } catch {}
+        }
+      }, 2000);
+    } catch (e) {
+      console.error("Failed to send text message", e);
+    } finally {
+      setIsSendingText(false);
+    }
   };
 
   return (
@@ -496,6 +620,79 @@ const Agent = ({
             Start interview
           </Link>
         )}
+        {/* Text reply controls */}
+        <div className="w-full max-w-2xl mt-2 flex items-center justify-between gap-3">
+          <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              className="accent-primary"
+              checked={textInputEnabled}
+              onChange={(e) => setTextInputEnabled(e.target.checked)}
+            />
+            Enable typed replies
+          </label>
+        </div>
+        <div className="w-full max-w-2xl mt-2">
+          <div className="relative flex items-end gap-3 rounded-xl border border-dark-200 bg-dark-200/60 p-3 shadow-sm focus-within:border-primary/60 focus-within:bg-dark-100 transition-colors">
+            <textarea
+              className="flex-1 min-h-12 max-h-40 resize-y bg-transparent text-foreground placeholder:text-muted-foreground border-0 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus:shadow-none"
+              placeholder={callStatus === "ACTIVE" ? (textInputEnabled ? "Type your reply... (Enter to send, Shift+Enter for newline)" : "Typed replies disabled") : "Start the call to send messages"}
+              value={textReply}
+              onChange={(e) => {
+                if (e.target.value.length <= maxTextChars) setTextReply(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (!textInputEnabled) return;
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (textReply.trim() && callStatus === "ACTIVE" && !isSendingText) {
+                    handleSendText();
+                  }
+                }
+              }}
+              disabled={callStatus !== "ACTIVE" || isSendingText || !textInputEnabled}
+              aria-label="Text reply"
+              maxLength={maxTextChars}
+            />
+            <div className="flex flex-col items-end gap-2 min-w-24">
+              <div className="text-[10px] text-muted-foreground" aria-live="polite">
+                {textReply.length}/{maxTextChars}
+              </div>
+              <button
+                className="btn-primary px-4 py-2"
+                onClick={handleSendText}
+                disabled={callStatus !== "ACTIVE" || isSendingText || !textInputEnabled || !textReply.trim()}
+                aria-label="Send typed reply"
+                title="Send"
+              >
+                {isSendingText ? "Sending…" : "Send ↩"}
+              </button>
+            </div>
+            {!textInputEnabled && (
+              <div className="absolute inset-0 rounded-xl bg-black/30 pointer-events-none" aria-hidden />
+            )}
+          </div>
+
+          {/* Quick suggestions */}
+          <div className="mt-2 flex flex-wrap gap-2">
+            {["Could you clarify that?","Here is my approach…","Can you give an example?","I’d like to add…"].map((s) => (
+              <button
+                key={s}
+                type="button"
+                className="px-3 py-1 rounded-full bg-dark-200 hover:bg-dark-100 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => {
+                  if (!textInputEnabled) return;
+                  const next = textReply ? `${textReply} ${s}` : s;
+                  if (next.length <= maxTextChars) setTextReply(next);
+                }}
+                disabled={!textInputEnabled || callStatus !== "ACTIVE"}
+                aria-label={`Insert suggestion: ${s}`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );

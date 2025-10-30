@@ -17,7 +17,7 @@ export default function ThemeToggle() {
     <button
       aria-label="Toggle theme"
       onClick={() => setTheme(current === "dark" ? "light" : "dark")}
-      className="inline-flex items-center justify-center size-9 rounded-full border border-input bg-transparent hover:bg-secondary/50 transition-colors"
+      className="inline-flex items-center justify-center size-9 rounded-full border border-input bg-transparent hover:bg-secondary/50 transition-colors cursor-pointer"
     >
       {current === "dark" ? (
         <Sun className="size-4 text-primary-200" />
