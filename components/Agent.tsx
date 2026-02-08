@@ -318,12 +318,12 @@ const Agent = ({
       if (typeof (anyVapi.sendMessage) === "function") {
         try {
           await anyVapi.sendMessage(trimmed);
-        } catch {}
+        } catch { }
       }
       if (typeof (anyVapi.inputText) === "function") {
         try {
           await anyVapi.inputText(trimmed);
-        } catch {}
+        } catch { }
       }
       setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
       setTextReply("");
@@ -358,15 +358,15 @@ const Agent = ({
               const anyVapi2 = vapi as any;
               let attemptedAt = Date.now();
               if (typeof anyVapi2.say === "function") {
-                try { await anyVapi2.say(reply); } catch {}
+                try { await anyVapi2.say(reply); } catch { }
                 attemptedAt = Date.now();
               } else if (typeof anyVapi2.send === "function") {
-                try { await anyVapi2.send({ type: "output_text", text: reply }); } catch {}
+                try { await anyVapi2.send({ type: "output_text", text: reply }); } catch { }
                 attemptedAt = Date.now();
               }
               // No local TTS fallback; rely on SDK voice only
             }
-          } catch {}
+          } catch { }
         }
       }, 2000);
     } catch (e) {
@@ -481,7 +481,7 @@ const Agent = ({
                 />
                 <span id="role-help" className="text-xs text-muted-foreground">Job title or role you are interviewing for.</span>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {["Frontend Developer","Backend Developer","Data Analyst"].map((preset) => (
+                  {["Frontend Developer", "Backend Developer", "Data Analyst"].map((preset) => (
                     <button
                       key={preset}
                       type="button"
@@ -513,7 +513,7 @@ const Agent = ({
                         role="listbox"
                         className="absolute z-20 mt-1 w-full rounded-md bg-dark-200 border border-input shadow-lg overflow-hidden"
                       >
-                        {(["technical","behavioral","mixed"] as const).map((t) => (
+                        {(["technical", "behavioral", "mixed"] as const).map((t) => (
                           <button
                             key={t}
                             type="button"
@@ -569,7 +569,7 @@ const Agent = ({
                     onChange={(e) => setFormTechstack(e.target.value)}
                   />
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {["React","Node","SQL"].map((tag) => (
+                    {["React", "Node", "SQL"].map((tag) => (
                       <button
                         key={tag}
                         type="button"
@@ -695,7 +695,7 @@ const Agent = ({
 
           {/* Quick suggestions */}
           <div className="mt-2 flex flex-wrap gap-2">
-            {["Could you clarify that?","Here is my approach…","Can you give an example?","I’d like to add…"].map((s) => (
+            {["Could you clarify that?", "Here is my approach…", "Can you give an example?", "I’d like to add…"].map((s) => (
               <button
                 key={s}
                 type="button"

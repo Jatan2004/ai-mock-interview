@@ -161,36 +161,27 @@ Engage naturally & react appropriately:
 
 export const feedbackSchema = z.object({
   totalScore: z.number(),
-  categoryScores: z.tuple([
+  categoryScores: z.array(
     z.object({
-      name: z.literal("Communication Skills"),
+      name: z.string(),
       score: z.number(),
       comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Technical Knowledge"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Problem Solving"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Cultural Fit"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-    z.object({
-      name: z.literal("Confidence and Clarity"),
-      score: z.number(),
-      comment: z.string(),
-    }),
-  ]),
+    })
+  ),
   strengths: z.array(z.string()),
   areasForImprovement: z.array(z.string()),
   finalAssessment: z.string(),
+  jdMatch: z.object({
+    percentage: z.number(),
+    missingSkills: z.array(z.string()),
+    missingKeywords: z.array(z.string()),
+    recommendation: z.string(),
+  }).optional(),
+  optimizedBullets: z.array(z.object({
+    original: z.string(),
+    optimized: z.string(),
+    reason: z.string(),
+  })),
 });
 
 export const interviewCovers = [

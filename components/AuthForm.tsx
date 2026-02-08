@@ -98,67 +98,81 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const isSignIn = type === "sign-in";
 
   return (
-    <div className="card-border lg:min-w-[566px]">
-      <div className="flex flex-col gap-6 card py-14 px-10">
-        <div className="flex flex-row gap-2 justify-center">
-          <Image 
-            src="/logo.svg" 
-            alt="logo" 
-            height={32} 
-            width={38}
-            className="logo-theme"
-          />
-          <h2 className="text-primary dark:text-primary-100">AI Interviews</h2>
-        </div>
+    <div className="relative group/auth-container w-full max-w-[566px] mx-auto">
+      {/* Dramatic behind-the-box glow pulse */}
+      <div className="absolute inset-0 bg-primary-200/5 blur-[120px] rounded-full opacity-100 transition-opacity duration-1000 -z-10 animate-pulse" />
 
-        <h3>Practice job interviews with AI</h3>
+      <div className="glass-panel p-8 md:p-12 relative overflow-hidden animate-border-glow">
+        <div className="flex flex-col gap-8 relative z-10">
+          <div className="flex flex-row gap-3 justify-center items-center">
+            <Image
+              src="/logo.svg"
+              alt="logo"
+              height={32}
+              width={38}
+              className="logo-theme"
+            />
+            <h2 className="text-3xl font-black tracking-tighter uppercase elite-text-gradient">AI Interviews</h2>
+          </div>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full space-y-6 mt-4 form"
-          >
-            {!isSignIn && (
+          <div className="text-center space-y-2">
+            <h3 className="text-xl md:text-2xl font-bold text-dark-100 dark:text-white">
+              {isSignIn ? "Welcome Back" : "Get Started"}
+            </h3>
+            <p className="text-sm text-light-600 dark:text-light-100/50 font-medium">
+              Practice job interviews with <span className="text-primary-200">AI-powered</span> intelligence.
+            </p>
+          </div>
+
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="w-full space-y-6 form"
+            >
+              {!isSignIn && (
+                <FormField
+                  control={form.control}
+                  name="name"
+                  label="Full Name"
+                  placeholder="John Doe"
+                  type="text"
+                />
+              )}
+
               <FormField
                 control={form.control}
-                name="name"
-                label="Name"
-                placeholder="Your Name"
-                type="text"
+                name="email"
+                label="Email Address"
+                placeholder="you@example.com"
+                type="email"
               />
-            )}
 
-            <FormField
-              control={form.control}
-              name="email"
-              label="Email"
-              placeholder="Your email address"
-              type="email"
-            />
+              <FormField
+                control={form.control}
+                name="password"
+                label="Password"
+                placeholder="••••••••"
+                type="password"
+              />
 
-            <FormField
-              control={form.control}
-              name="password"
-              label="Password"
-              placeholder="Enter your password"
-              type="password"
-            />
+              <Button className="btn relative group/btn overflow-hidden mx-auto flex w-fit py-6 text-sm uppercase tracking-widest font-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(202,197,254,0.2)]" type="submit">
+                <span className="relative z-10">{isSignIn ? "Sign In" : "Create Account"}</span>
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white/20 opacity-30 animate-shine" />
+              </Button>
+            </form>
+          </Form>
 
-            <Button className="btn" type="submit">
-              {isSignIn ? "Sign In" : "Create an Account"}
-            </Button>
-          </form>
-        </Form>
-
-        <p className="text-center">
-          {isSignIn ? "No account yet?" : "Have an account already?"}
-          <Link
-            href={!isSignIn ? "/sign-in" : "/sign-up"}
-            className="font-bold text-user-primary ml-1"
-          >
-            {!isSignIn ? "Sign In" : "Sign Up"}
-          </Link>
-        </p>
+          <p className="text-center text-sm text-light-600 dark:text-light-100/40 font-medium">
+            {isSignIn ? "No account yet?" : "Have an account already?"}
+            <Link
+              href={!isSignIn ? "/sign-in" : "/sign-up"}
+              className="ml-2 font-bold text-primary-200 hover:text-primary-100 transition-colors underline underline-offset-4 decoration-primary-200/30"
+            >
+              {!isSignIn ? "Sign In" : "Sign Up"}
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

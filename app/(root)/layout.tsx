@@ -4,34 +4,19 @@ import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
 import { isAuthenticated } from "@/lib/actions/auth.action";
-import LogoutButton from "@/components/LogoutButton";
-import ThemeToggle from "@/components/ThemeToggle";
+import Navbar from "@/components/Navbar";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = await isAuthenticated();
   if (!isUserAuthenticated) redirect("/sign-in");
 
   return (
-    <div className="root-layout">
-      <nav className="flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Image 
-            src="/logo.svg" 
-            alt="MockMate Logo" 
-            width={38} 
-            height={32}
-            className="logo-theme"
-          />
-          <h2 className="text-primary dark:text-primary-100">AI Interviews</h2>
-        </Link>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <LogoutButton />
-        </div>
-      </nav>
-
-      {children}
-    </div>
+    <>
+      <Navbar />
+      <div className="root-layout">
+        {children}
+      </div>
+    </>
   );
 };
 
