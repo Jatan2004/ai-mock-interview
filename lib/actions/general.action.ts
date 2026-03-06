@@ -6,6 +6,10 @@ import { google } from "@ai-sdk/google";
 import { db } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
 
+// Shows first 8 + last 4 chars so you can identify the key without exposing it
+const maskKey = (key: string | undefined) =>
+  key ? `${key.slice(0, 8)}...${key.slice(-4)}` : "(not set)";
+
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
 
@@ -17,6 +21,8 @@ export async function createFeedback(params: CreateFeedbackParams) {
       )
       .join("");
 
+    const feedbackKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    console.log(`[Gemini] [Interview Feedback] Using key: ${maskKey(feedbackKey)}`);
     const { object } = await generateObject({
       model: google("gemini-2.5-flash"),
       schema: feedbackSchema,
@@ -107,7 +113,7 @@ export async function getLatestInterviews(
       .limit(limit)
       .get();
 
-    return interviews.docs.map((doc) => ({
+    return interviews.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
     })) as Interview[];
@@ -131,7 +137,7 @@ export async function getInterviewsByUserId(
       .orderBy("createdAt", "desc")
       .get();
 
-    return interviews.docs.map((doc) => ({
+    return interviews.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
     })) as Interview[];

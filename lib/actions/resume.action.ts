@@ -1,12 +1,22 @@
 "use server";
 
 import { generateObject } from "ai";
-import { google } from "@ai-sdk/google";
+import { google, createGoogleGenerativeAI } from "@ai-sdk/google";
+
+// Dedicated provider for Resume Analysis to separate rate limits
+const googleResume = createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY_RESUME || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+});
+
 import { extractText } from "unpdf";
 import { z } from "zod";
 
 import { db } from "@/firebase/admin";
 import { getCurrentUser } from "./auth.action";
+
+// Shows first 8 + last 4 chars so you can identify the key without exposing it
+const maskKey = (key: string | undefined) =>
+    key ? `${key.slice(0, 8)}...${key.slice(-4)}` : "(not set)";
 
 const resumeAnalysisSchema = z.object({
     atsScore: z.number().min(0).max(100),
@@ -98,9 +108,10 @@ export async function analyzeResume(formData: FormData) {
         }
 
         // AI Analysis
-        console.log("AnalyzeResume: Sending to Gemini for analysis...");
+        const resumeKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY_RESUME || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+        console.log(`[Gemini] [Resume Analysis] Using key: ${maskKey(resumeKey)}`);
         const { object } = await generateObject({
-            model: google("gemini-2.5-flash"),
+            model: googleResume("gemini-2.5-flash"),
             schema: resumeAnalysisSchema,
             prompt: `
         You are an expert ATS (Applicant Tracking System) and Career Coach. 
@@ -171,9 +182,10 @@ export async function generateCoverLetter(resumeText: string, jdText: string) {
     if (!user) throw new Error("Unauthorized");
 
     try {
-        console.log("GenerateCoverLetter: Sending to Gemini...");
+        const clKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY_RESUME || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+        console.log(`[Gemini] [Cover Letter] Using key: ${maskKey(clKey)}`);
         const { object } = await generateObject({
-            model: google("gemini-2.5-flash"),
+            model: googleResume("gemini-2.5-flash"),
             schema: z.object({
                 coverLetter: z.string()
             }),
