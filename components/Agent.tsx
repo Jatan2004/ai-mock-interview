@@ -55,6 +55,7 @@ const Agent = ({
   const [textInputEnabled, setTextInputEnabled] = useState<boolean>(true);
   const maxTextChars = 500;
   const [formNumQuestions, setFormNumQuestions] = useState<number>(5);
+  const [isGeneratingFeedback, setIsGeneratingFeedback] = useState<boolean>(false);
 
   // Browser TTS fallback removed to ensure consistent agent voice
   // Close modal with ESC
@@ -151,6 +152,7 @@ const Agent = ({
 
     const handleGenerateFeedback = async (messages: SavedMessage[]) => {
       console.log("handleGenerateFeedback");
+      setIsGeneratingFeedback(true);
 
       const { success, feedbackId: id } = await createFeedback({
         interviewId: interviewId!,
@@ -163,6 +165,7 @@ const Agent = ({
         router.push(`/interview/${interviewId}/feedback`);
       } else {
         console.log("Error saving feedback");
+        setIsGeneratingFeedback(false);
         router.push("/");
       }
     };
@@ -378,6 +381,35 @@ const Agent = ({
 
   return (
     <>
+      {/* Feedback Generation Overlay */}
+      {isGeneratingFeedback && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-dark-100/90 backdrop-blur-md animate-fadeIn">
+          <div className="relative flex items-center justify-center">
+            {/* Outer spinning ring */}
+            <div className="size-24 rounded-full border-4 border-primary-200/20 border-t-primary-200 animate-spin" />
+            {/* Inner pulsing dot */}
+            <div className="absolute size-10 rounded-full bg-primary-200/20 animate-pulse flex items-center justify-center">
+              <div className="size-4 rounded-full bg-primary-200" />
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h3 className="text-xl font-bold text-white">Generating your feedback…</h3>
+            <p className="text-sm text-light-100 max-w-xs">
+              Our AI is analysing your interview. This may take a few seconds.
+            </p>
+          </div>
+          {/* Animated dots */}
+          <div className="flex gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="size-2 rounded-full bg-primary-200 animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
       <div className="call-view">
         {/* AI Interviewer Card */}
         <div className="card-interviewer">
